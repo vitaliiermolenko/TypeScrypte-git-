@@ -163,3 +163,49 @@ class Group {
     return sortedStudents;
   }
 }
+
+class Student {
+  _firstName: string;
+  _lastName: string;
+  _birthYear: number;
+  _grades: number[] = [];
+  _visits: boolean[] = []; 
+
+  constructor(firstName: string, lastName: string, birthYear: number) {
+    this._firstName = firstName;
+    this._lastName = lastName;
+    this._birthYear = birthYear;
+  }
+
+  get fullName(): string {
+    return `${this._lastName} ${this._firstName}`;
+  }
+
+  set fullName(value: string) {
+    [this._lastName, this._firstName] = value.split(' ');
+  }
+
+  get age(): number {
+    return new Date().getFullYear() - this._birthYear;
+  }
+
+  set grade(value: number) {
+    this._grades.push(value);
+  }
+
+  set visit(value: boolean) {
+    this._visits.push(value);
+  }
+
+  getPerformanceRating(): number {
+    const gradeValues: number[] = Object.values(this._grades);
+
+    if (!gradeValues.length) return 0;
+
+    const averageGrade: number = gradeValues.reduce((sum, grade) => sum + grade, 0) / gradeValues.length;
+    const attendancePercentage: number = (this._visits.filter((present) => present).length / this._visits.length) * 100;
+
+    return (averageGrade + attendancePercentage) / 2;
+  }
+}
+
