@@ -47,14 +47,14 @@ class School {
 
 
 class Area {
-  _levels: any[] = [];
+  _levels: string[] = [];
   _name: string;
 
   constructor(name: string) {
     this._name = name;
   }
 
-  get levels(): any[] {
+  get levels(): string[] {
     return this._levels;
   }
 
@@ -62,11 +62,11 @@ class Area {
     return this._name;
   }
 
-  addLevel(level: any): void {
+  addLevel(level: string): void {
     this._levels.push(level);
   }
 
-  removeLevel(level: any): void {
+  removeLevel(level: string): void {
     const index = this._levels.indexOf(level);
     if (index !== -1) {
       this._levels.splice(index, 1);
@@ -76,7 +76,7 @@ class Area {
 
 
 class Level {
-  private _groups: any[] = [];
+  private _groups: string[] = [];
   private _name: string;
   private _description: string;
 
@@ -85,11 +85,11 @@ class Level {
     this._description = description;
   }
 
-  get groups(): any[] {
+  get groups(): string[] {
     return this._groups;
   }
 
-  set groups(groups: any[]) {
+  set groups(groups: string[]) {
     this._groups = groups;
   }
 
@@ -109,11 +109,11 @@ class Level {
     this._description = description;
   }
 
-  addGroup(group: any): void {
+  addGroup(group: string): void {
     this._groups.push(group);
   }
 
-  removeGroup(group: any): void {
+  removeGroup(group: string): void {
     const index = this._groups.indexOf(group);
     if (index !== -1) {
       this._groups.splice(index, 1);
@@ -154,7 +154,7 @@ class Group {
     }
   }
 
-  setStatus(status: string): void {
+  set status(status: string) {
     this._status = status;
   }
 
