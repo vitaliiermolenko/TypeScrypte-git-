@@ -1,106 +1,100 @@
-class Circle {
-    private readonly _name: string;
-    private readonly _color: string;
-    private readonly _radius: number;
-
-    constructor(name: string, color: string, radius: number) {
-        this._name = name;
-        this._color = color;
-        this._radius = radius;
-    }
-
-    get name(): string {
-        return this._name;
-    }
-
-    get color(): string {
-        return this._color;
-    }
-
-    calculateArea(): number {
-        return Math.PI * this._radius ** 2;
-    }
-
-    print(): void {
-        console.log(`Area of ${this._name} = ${this.calculateArea()}`);
-    }
+// Interface для фігур
+interface IShape {
+    readonly name: string;
+    readonly color: string;
+    calculateArea(): number;
 }
 
-class Rectangle {
-    private readonly _name: string;
-    private readonly _color: string;
-    private readonly _width: number;
-    private readonly _height: number;
+// Абстрактний клас для прямокутних фігур
+abstract class ARectangles implements IShape {
+    readonly name: string;
+    readonly color: string;
+    protected width: number;
+    protected height: number;
 
     constructor(name: string, color: string, width: number, height: number) {
-        this._name = name;
-        this._color = color;
-        this._width = width;
-        this._height = height;
-    }
-
-    get name(): string {
-        return this._name;
-    }
-
-    get color(): string {
-        return this._color;
+        this.name = name;
+        this.color = color;
+        this.width = width;
+        this.height = height;
     }
 
     calculateArea(): number {
-        return this._width * this._height;
+        return this.width * this.height;
     }
 
-    print(): void {
-        console.log(`Area of ${this._name} = ${this.calculateArea()}`);
-    }
+    abstract print(): void;
 }
 
-class Square extends Rectangle {
-    constructor(name: string, color: string, sideLength: number) {
-        super(name, color, sideLength, sideLength);
-    }
-}
+// Клас кола
+class Circle implements IShape {
+    readonly name: string;
+    readonly color: string;
+    private readonly radius: number;
 
-class Triangle {
-    private readonly _name: string;
-    private readonly _color: string;
-    private readonly _base: number;
-    private readonly _height: number;
-
-    constructor(name: string, color: string, base: number, height: number) {
-        this._name = name;
-        this._color = color;
-        this._base = base;
-        this._height = height;
-    }
-
-    get name(): string {
-        return this._name;
-    }
-
-    get color(): string {
-        return this._color;
+    constructor(color: string, radius: number) {
+        this.name = "Circle";
+        this.color = color;
+        this.radius = radius;
     }
 
     calculateArea(): number {
-        return 0.5 * this._base * this._height;
-    }
-
-    print(): void {
-        console.log(`Area of ${this._name} = ${this.calculateArea()}`);
+        return Math.PI * Math.pow(this.radius, 2);
     }
 }
 
-// Приклад використання:
-const circle = new Circle("Circle", "red", 5);
-circle.print();
+// Клас прямокутника
+class Rectangle extends ARectangles {
+    constructor(color: string, width: number, height: number) {
+        super("Rectangle", color, width, height);
+    }
 
-const rectangle = new Rectangle("Rectangle", "blue", 4, 6);
-rectangle.print();
+    print(): void {
+        console.log(`Area of ${this.name} (${this.color}): ${this.width} * ${this.height}`);
+    }
+}
 
-const square = new Square("Square", "green", 5);
-square.print();
+// Клас квадрата
+class Square extends ARectangles {
+    constructor(color: string, sideLength: number) {
+        super("Square", color, sideLength, sideLength);
+    }
 
-const triangle = new Triangle("Triangle", "yellow", 4, 3);
-triangle.print();
+    print(): void {
+        console.log(`Area of ${this.name} (${this.color}): ${this.width} * ${this.height}`);
+    }
+}
+
+// Клас трикутника
+class Triangle implements IShape {
+    readonly name: string;
+    readonly color: string;
+    private readonly base: number;
+    private readonly height: number;
+
+    constructor(color: string, base: number, height: number) {
+        this.name = "Triangle";
+        this.color = color;
+        this.base = base;
+        this.height = height;
+    }
+
+    calculateArea(): number {
+        return (this.base * this.height) / 2;
+    }
+}
+
+// Приклад використання
+const square = new Square("red", 5);
+console.log(square.calculateArea());
+square.print(); 
+
+const rectangle = new Rectangle("blue", 4, 6);
+console.log(rectangle.calculateArea()); 
+rectangle.print(); 
+
+const circle = new Circle("blue", 3);
+console.log(circle.calculateArea());
+
+const triangle = new Triangle("green", 4, 6);
+console.log(triangle.calculateArea());
