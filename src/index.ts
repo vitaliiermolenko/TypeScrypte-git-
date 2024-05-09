@@ -1,48 +1,114 @@
-interface Entity {
-    name: string;
-}
-
-interface Movie extends Entity {
+interface Movie {
+    title: string;
     year: number;
     rating: number;
     awards: string[];
 }
 
-interface Category<T extends Entity> extends Entity {
-    items: T[];
+interface Category {
+    name: string;
+    movies: Movie[];
 }
 
-interface Filter<T> {
-    type: 'search' | 'range' | 'values';
-    filter?: keyof T;
-    filterTo?: T[keyof T];
-    values?: T[keyof T][];
+// Базовий клас для фільтрів
+class Filter {
+    constructor(
+        public filterType: string,
+        public filter?: string | number, 
+        public filterTo?: string | number, 
+        public values?: string[] 
+    ) {}
 }
 
-class List<T extends Entity> {
-    items: T[];
-    filters: Filter<T>[];
+// Клас для фільтрації за пошуком
+class SearchFilter extends Filter {
+    constructor(public filter: string) {
+        super('search');
+    }
+}
 
-    constructor(items: T[], filters: Filter<T>[]) {
-        this.items = items;
+// Клас для фільтрації за діапазоном значень
+class RangeFilter extends Filter {
+    constructor(public filter: string, public filterTo: number) {
+        super('range', undefined, filterTo);
+    }
+}
+
+// Клас для фільтрації за вибраними значеннями
+class ValuesFilter extends Filter {
+    constructor(public values: string[]) {
+        super('values', undefined, undefined, values);
+    }
+}
+
+// Клас для списку фільмів
+class MovieList {
+    movies: Movie[];
+    filters: Filter[];
+
+    constructor(movies: Movie[], filters: Filter[]) {
+        this.movies = movies;
         this.filters = filters;
     }
 
-    applySearchFilter(filter: Filter<T>) {
-        if (filter.type === 'search' && filter.filter) {
-            // Implement search logic based on filter.filter
-        }
+    // Метод застосовує фільтр за пошуком до списку фільмів
+    applySearchValue(searchFilter: SearchFilter) {
+        this.movies = this.movies.filter(movie => movie.title.toLowerCase().includes(searchFilter.filter.toLowerCase()));
     }
 
-    applyRangeFilter(filter: Filter<T>) {
-        if (filter.type === 'range' && filter.filter && filter.filterTo) {
-            // Implement range filter logic based on filter.filter and filter.filterTo
-        }
+    // Метод застосовує фільтр за діапазоном значень до списку фільмів
+    applyRangeValue(rangeFilter: RangeFilter) {
+        this.movies = this.movies.filter(movie => {
+            switch (rangeFilter.filter) {
+                case 'year':
+                    return movie.year >= rangeFilter.filterTo;
+                case 'rating':
+                    return movie.rating >= rangeFilter.filterTo;
+                default:
+                    return true;
+            }
+        });
     }
 
-    applyValuesFilter(filter: Filter<T>) {
-        if (filter.type === 'values' && filter.values) {
-            // Implement values filter logic based on filter.values
-        }
+    applyValuesFilter(valuesFilter: ValuesFilter) {
+        // Код для фільтрації
+    }
+}
+
+// Клас для списку категорій
+class CategoryList {
+    categories: Category[];
+    filters: Filter[];
+
+    constructor(categories: Category[], filters: Filter[]) {
+        this.categories = categories;
+        this.filters = filters;
+    }
+
+    // Метод застосовує фільтр за пошуком до списку категорій
+    applySearchValue(searchFilter: SearchFilter) {
+        this.categories.forEach(category => {
+            category.movies = category.movies.filter(movie => movie.title.toLowerCase().includes(searchFilter.filter.toLowerCase()));
+        });
+    }
+
+    // Метод застосовує фільтр за діапазоном значень до списку категорій
+    applyRangeValue(rangeFilter: RangeFilter) {
+        this.categories.forEach(category => {
+            category.movies = category.movies.filter(movie => {
+                switch (rangeFilter.filter) {
+                    case 'year':
+                        return movie.year >= rangeFilter.filterTo;
+                    case 'rating':
+                        return movie.rating >= rangeFilter.filterTo;
+                    default:
+                        return true;
+                }
+            });
+        });
+    }
+
+    applyValuesFilter(valuesFilter: ValuesFilter) {
+        // Код для фільтрації
     }
 }
