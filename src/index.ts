@@ -59,23 +59,18 @@ class TodoList {
     }
 
     // Метод для редагування запису за ідентифікатором
-    editItem(id: number, title: string, description: string, type: NoteType): boolean {
+    editItem(id: number, title: string, description: string, type: NoteType): TodoItem | undefined {
         const item = this.items.find(item => item.id === id);
         if (item) {
+            item.title = title;
+            item.description = description;
+            item.type = type;
             if (item.isEditable) {
-                item.title = title;
-                item.description = description;
-                item.type = type; // Оновлення типу нотатки
                 item.updateLastEditDate();
-                return true;
-            } else {
-                item.title = title;
-                item.description = description;
-                item.type = type; // Оновлення типу нотатки
-                return true;
             }
+            return item;
         }
-        return false;
+        return undefined;
     }
 
     // Метод для отримання повної інформації про нотатку за ідентифікатором
@@ -98,23 +93,9 @@ class TodoList {
         return false;
     }
 
-    // Метод для пошуку нотатки за ім'ям або змістом
-    searchItem(query: string): TodoItem[] {
-        query = query.toLowerCase();
-        return this.items.filter(item => item.title.toLowerCase().includes(query) || item.description.toLowerCase().includes(query));
-    }
-
-    // Метод для сортування нотаток за статусом (виконано / невиконано)
-    sortItemsByStatus(): void {
-        this.items.sort((a, b) => {
-            if (a.isCompleted && !b.isCompleted) {
-                return 1;
-            } else if (!a.isCompleted && b.isCompleted) {
-                return -1;
-            } else {
-                return 0;
-            }
-        });
+    // Метод для отримання списку всіх нотаток для сортування
+    getItemsForSorting(): TodoItem[] {
+        return this.items;
     }
 
     // Метод для сортування нотаток за часом створення (від нових до старих)
@@ -123,21 +104,51 @@ class TodoList {
     }
 }
 
+class TodoSearch {
+    constructor(private todoList: TodoList) {}
+
+    // Метод для пошуку нотатки за ім'ям або змістом
+    searchItem(query: string): TodoItem[] {
+        const items = this.todoList.getItemsForSorting();
+        query = query.toLowerCase();
+        return items.filter(item => item.title.toLowerCase().includes(query) || item.description.toLowerCase().includes(query));
+    }
+}
+
+class TodoSorter {
+    constructor(private todoList: TodoList) {}
+
+    // Метод для сортування нотаток за статусом (виконано / невиконано)
+    sortItemsByStatus(): TodoItem[] {
+        const items = this.todoList.getItemsForSorting();
+        items.sort((a, b) => {
+            if (a.isCompleted && !b.isCompleted) {
+                return 1;
+            } else if (!a.isCompleted && b.isCompleted) {
+                return -1;
+            } else {
+                return 0;
+            }
+        });
+        return items;
+    }
+}
+
 const todoList = new TodoList();
+const todoSearch = new TodoSearch(todoList);
+const todoSorter = new TodoSorter(todoList);
 
-    const item1 = todoList.addItem('First Task', 'Description of the first task', NoteType.DEFAULT);
-    const item2 = todoList.addItem('Second Task', 'Description of the second task', NoteType.CONFIRMATION_REQUIRED);
-
-// Позначення одного з записів як виконаний
+const item1 = todoList.addItem('First Task', 'Description of the first task', NoteType.DEFAULT);
+const item2 = todoList.addItem('Second Task', 'Description of the second task', NoteType.CONFIRMATION_REQUIRED);
 
 // Сортування нотаток за статусом
-todoList.sortItemsByStatus();
-console.log('Sorted by status:', todoList.getAllItems());
+const sortedByStatus = todoSorter.sortItemsByStatus();
+console.log('Sorted by status:', sortedByStatus);
 
 // Сортування нотаток за часом створення
 todoList.sortItemsByCreationTime();
 console.log('Sorted by creation time:', todoList.getAllItems());
 
 // Пошук нотаток за ім'ям або змістом
-const searchResult = todoList.searchItem('first');
+const searchResult = todoSearch.searchItem('first');
 console.log('Search result:', searchResult);
