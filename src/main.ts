@@ -1,35 +1,31 @@
-// Імпорт необхідних класів з файлів zoo.ts, advertisingDepartment.ts, accountingDepartment.ts, administration.ts, employees.ts, animals.ts та budget.ts
-import { Visitor, Cashier } from './zoo';
+import { Visitor, Cashier, TicketType } from './zoo';
 import { AdvertisingDepartment } from './advertisingDepartment';
-import { AccountingDepartment } from './accountingDepartment.ts'
-import { Administration, Employee as AdminEmployee } from './administration';
+import { AccountingDepartment } from './accountingDepartment';
+import { Administration, IEmployee as AdminIEmployee, AdminEmployee } from './administration';
 import { Employee, EmployeeManagement } from './employees';
 import { Animal, AnimalManagement } from './animals';
-import { BudgetEntry, BudgetManagement } from './budget';   
+import { BudgetEntry, BudgetManagement } from './budget';
+
+// Створення екземпляру Відділу реклами
+const advertisingDept = new AdvertisingDepartment();
 
 // Створення екземпляру каси
-const cashier = new Cashier();
+const cashier = new Cashier(advertisingDept);
 
 // Створення екземплярів відвідувачів
 const visitor1 = new Visitor("John Doe", "john@example.com");
 const visitor2 = new Visitor("Jane Smith", "jane@example.com");
 
+// Додавання відвідувачів як спостерігачів
+cashier.addObserver(visitor1);
+cashier.addObserver(visitor2);
+
 // Продаж квитків відвідувачам
-cashier.sellTicket("adult", visitor1);
-cashier.sellTicket("child", visitor2);
+cashier.sellTicket(TicketType.ADULT, visitor1);
+cashier.sellTicket(TicketType.CHILD, visitor2);
 
-// Виведення списку поточних відвідувачів
-console.log("Current Visitors:", cashier.getCurrentVisitors());
-// Виведення списку клієнтів
-console.log("Clients:", cashier.getClients());
-// Виведення виручки
-console.log("Revenue:", cashier.getRevenue());
-
-// Сповіщення відвідувачів
+// Сповіщення відвідувачів про закриття
 cashier.notifyVisitors("The zoo will close in 15 minutes.");
-
-// Створення екземпляру Відділу реклами з поточними клієнтами
-const advertisingDept = new AdvertisingDepartment(cashier.getClients());
 
 // Відправка новинної розсилки клієнтам
 advertisingDept.sendNewsletter("Welcome to our monthly newsletter!");
@@ -42,11 +38,9 @@ const accountingDept = new AccountingDepartment();
 // Запис виручки до бухгалтерії
 accountingDept.recordRevenue(cashier.getRevenue());
 
-// Додавання співробітників
+// Додавання співробітників і тварин
 accountingDept.addEmployee("Alice", 5000);
 accountingDept.addEmployee("Bob", 4500);
-
-// Додавання тварин
 accountingDept.addAnimal("Leo", "Lion", 300);
 accountingDept.addAnimal("Ella", "Elephant", 500);
 
@@ -56,79 +50,49 @@ console.log(accountingDept.generateFinancialReport());
 // Створення екземпляру адміністрації
 const admin = new Administration();
 
-// Додавання співробітників через адміністрацію
-admin.addEmployee({ id: 1, name: "Alice", position: "Manager" });
-admin.addEmployee({ id: 2, name: "Bob", position: "Keeper" });
+// Додавання співробітників як спостерігачів
+const adminEmployee1 = new AdminEmployee(1, "Alice", "Manager");
+const adminEmployee2 = new AdminEmployee(2, "Bob", "Keeper");
+admin.addObserver(adminEmployee1);
+admin.addObserver(adminEmployee2);
 
-// Видалення співробітника
+// Додавання та видалення співробітників і тварин
+admin.addEmployee({ id: 1, name: "Alice", position: "Manager" } as AdminIEmployee);
+admin.addEmployee({ id: 2, name: "Bob", position: "Keeper" } as AdminIEmployee);
 admin.removeEmployee(2);
-
-// Додавання тварин через адміністрацію
 admin.addAnimal({ id: 1, name: "Leo", species: "Lion", age: 5, healthStatus: "Healthy" });
 admin.addAnimal({ id: 2, name: "Ella", species: "Elephant", age: 10, healthStatus: "Healthy" });
-
-// Видалення тварини
 admin.removeAnimal(1);
 
-// Сповіщення про подію
+// Сповіщення про події
 admin.notifyEvent("New promotion: 50% off on all tickets this weekend!");
 
-// Виведення списку співробітників
+// Виведення списку співробітників і тварин
 console.log("Employees:", admin.employees);
-
-// Виведення списку тварин
 console.log("Animals:", admin.animals);
 
 // Створення екземпляру для управління співробітниками
 const employeeManagement = new EmployeeManagement();
-
-// Додавання співробітників через управління співробітниками
 employeeManagement.addEmployee({ id: 1, name: "Alice", position: "Manager" });
 employeeManagement.addEmployee({ id: 2, name: "Bob", position: "Keeper" });
-
-// Видалення співробітника
 employeeManagement.removeEmployee(2);
-
-// Отримання співробітника за ID
 console.log("Employee with ID 1:", employeeManagement.getEmployeeById(1));
-
-// Виведення списку всіх співробітників
 console.log("All Employees:", employeeManagement.getAllEmployees());
 
 // Створення екземпляру для управління тваринами
 const animalManagement = new AnimalManagement();
-
-// Додавання тварин через управління тваринами
 animalManagement.addAnimal({ id: 1, name: "Leo", species: "Lion", age: 5, healthStatus: "Healthy" });
 animalManagement.addAnimal({ id: 2, name: "Ella", species: "Elephant", age: 10, healthStatus: "Healthy" });
-
-// Видалення тварини
 animalManagement.removeAnimal(1);
-
-// Отримання тварини за ID
 console.log("Animal with ID 2:", animalManagement.getAnimalById(2));
-
-// Виведення списку всіх тварин
 console.log("All Animals:", animalManagement.getAllAnimals());
 
 // Створення екземпляру для управління бюджетом
 const budgetManagement = new BudgetManagement();
-
-// Додавання статей бюджету
 budgetManagement.addEntry({ id: 1, description: "Ticket Sales", amount: 200, type: 'income' });
 budgetManagement.addEntry({ id: 2, description: "Employee Salaries", amount: 9500, type: 'expense' });
-
-// Видалення статті бюджету
 budgetManagement.removeEntry(2);
-
-// Отримання статті бюджету за ID
 console.log("Budget Entry with ID 1:", budgetManagement.getEntryById(1));
-
-// Виведення загального доходу
 console.log("Total Income:", budgetManagement.getTotalIncome());
-
-// Виведення загальних витрат
 console.log("Total Expenses:", budgetManagement.getTotalExpenses());
-
-// Виведення чистого бюджету
 console.log("Net Budget:", budgetManagement.getNetBudget());

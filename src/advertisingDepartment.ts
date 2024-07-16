@@ -2,7 +2,14 @@ import { Client } from './zoo';
 
 // Клас AdvertisingDepartment для управління розсилками і промоціями
 class AdvertisingDepartment {
-    constructor(private clients: Client[]) {}
+    private clients: Client[] = [];
+
+    constructor() {}
+
+    // Метод для додавання клієнта
+    addClient(client: Client): void {
+        this.clients.push(client);
+    }
 
     // Метод для відправки новинної розсилки клієнтам
     sendNewsletter(content: string): void {

@@ -1,12 +1,14 @@
-// Інтерфейс Employee для опису властивостей співробітника
-interface Employee {
+import { Observer, Observable } from './observer';
+
+// Інтерфейс IEmployee для опису властивостей співробітника
+interface IEmployee {
     id: number;
     name: string;
     position: string;
 }
 
-// Інтерфейс Animal для опису властивостей тварини
-interface Animal {
+// Інтерфейс IAnimal для опису властивостей тварини
+interface IAnimal {
     id: number;
     name: string;
     species: string;
@@ -14,13 +16,24 @@ interface Animal {
     healthStatus: string;
 }
 
-// Клас Administration для управління співробітниками та тваринами
-class Administration {
-    public employees: Employee[] = [];
-    public animals: Animal[] = [];
+// Клас AdminEmployee реалізує інтерфейс Observer для отримання сповіщень
+class AdminEmployee implements Observer {
+    constructor(public id: number, public name: string, public position: string) {}
+
+    // Метод для отримання сповіщень
+    update(message: string): void {
+        console.log(`Notifying Employee ${this.name}: ${message}`);
+    }
+}
+
+// Клас Administration для управління співробітниками та тваринами, реалізує інтерфейс Observable
+class Administration implements Observable {
+    public employees: IEmployee[] = [];
+    public animals: IAnimal[] = [];
+    private observers: Observer[] = [];
 
     // Метод для додавання співробітника
-    addEmployee(employee: Employee): void {
+    addEmployee(employee: IEmployee): void {
         this.employees.push(employee);
     }
 
@@ -30,7 +43,7 @@ class Administration {
     }
 
     // Метод для додавання тварини
-    addAnimal(animal: Animal): void {
+    addAnimal(animal: IAnimal): void {
         this.animals.push(animal);
     }
 
@@ -42,8 +55,24 @@ class Administration {
     // Метод для сповіщення про подію
     notifyEvent(event: string): void {
         console.log(`Administration Notification: ${event}`);
+        this.notifyObservers(event);
+    }
+
+    // Метод для додавання спостерігача
+    addObserver(observer: Observer): void {
+        this.observers.push(observer);
+    }
+
+    // Метод для видалення спостерігача
+    removeObserver(observer: Observer): void {
+        this.observers = this.observers.filter(obs => obs !== observer);
+    }
+
+    // Метод для сповіщення всіх спостерігачів
+    notifyObservers(message: string): void {
+        this.observers.forEach(observer => observer.update(message));
     }
 }
 
-// Експорт інтерфейсів Employee та Animal і класу Administration
-export { Employee, Animal, Administration };
+// Експорт інтерфейсів IEmployee та IAnimal і класу Administration
+export { IEmployee, IAnimal, Administration, AdminEmployee };

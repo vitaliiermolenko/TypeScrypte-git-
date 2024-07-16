@@ -1,5 +1,3 @@
-// employees.ts
-
 // Інтерфейс Employee для опису властивостей співробітника
 interface Employee {
     id: number;
